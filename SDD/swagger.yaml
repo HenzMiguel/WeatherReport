@@ -1,0 +1,301 @@
+openapi: 3.0.3
+info:
+  title: WeatherReport API (BFF Climático)
+  description: API Backend minimalista do sistema WeatherReport para monitoramento climático, estatísticas de risco e métricas administrativas.
+  version: 1.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Servidor de Desenvolvimento Local
+
+paths:
+  /auth/login:
+    post:
+      summary: Autenticação de Usuário (Retorna Token JWT)
+      operationId: autenticarUsuario
+      tags:
+        - Autenticação
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - senha
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@weatherreport.com
+                senha:
+                  type: string
+                  format: password
+                  example: "SenhaSegura123!"
+      responses:
+        '200':
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token_acesso:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  tipo_token:
+                    type: string
+                    example: "Bearer"
+                  papel:
+                    type: string
+                    enum: [USUARIO, ADMIN]
+                    example: "ADMIN"
+        '401':
+          $ref: '#/components/responses/Erro401'
+
+  /cidades:
+    get:
+      summary: Lista cidades com filtros e paginação
+      operationId: listarCidades
+      tags:
+        - Cidades
+      parameters:
+        - name: nome
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filtro por nome da cidade (busca parcial)
+        - name: uf
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+          description: Sigla do estado (ex: RS, SC, PR)
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - $ref: '#/components/parameters/HeaderCorrelationId'
+      responses:
+        '200':
+          description: Lista paginada de cidades
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dados:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CidadeResumida'
+                  paginacao:
+                    $ref: '#/components/schemas/PaginacaoMeta'
+
+  /cidades/{id}/previsao:
+    get:
+      summary: Previsão, risco e estatísticas de uma cidade (BFF Transformation)
+      description: Consome dados externos do radar/clima, processa refletividade (dBZ), calcula variações de temperatura e nível de risco.
+      operationId: obterPrevisaoCidade
+      tags:
+        - Cidades (BFF)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/HeaderCorrelationId'
+      responses:
+        '200':
+          description: Dados processados e unificados pelo BFF
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetalhePrevisaoCidade'
+        '404':
+          $ref: '#/components/responses/Erro404'
+        '503':
+          $ref: '#/components/responses/Erro503'
+
+  /admin/metricas:
+    get:
+      summary: Métricas técnicas do servidor (Restrito a ADMIN via RBAC)
+      operationId: obterMetricasSistema
+      security:
+        - BearerAuth: []
+      tags:
+        - Administração (RBAC)
+      parameters:
+        - $ref: '#/components/parameters/HeaderCorrelationId'
+      responses:
+        '200':
+          description: Métricas do sistema consumidas pelo Admin Dashboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_requisicoes:
+                    type: integer
+                    example: 12450
+                  total_erros:
+                    type: integer
+                    example: 8
+                  uso_cpu_porcentagem:
+                    type: number
+                    example: 12.4
+                  consumo_memoria_mb:
+                    type: number
+                    example: 210.5
+        '401':
+          $ref: '#/components/responses/Erro401'
+        '403':
+          $ref: '#/components/responses/Erro403'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    HeaderCorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Identificador único de correlação para rastreamento nos logs do servidor.
+
+  responses:
+    Erro400:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
+    Erro401:
+      description: Token ausente ou inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
+    Erro403:
+      description: Acesso negado - Papel insuficiente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
+    Erro404:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
+    Erro503:
+      description: Serviço externo indisponível ou Circuit Breaker aberto
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
+
+  schemas:
+    ErroPadronizado:
+      type: object
+      required:
+        - mensagem_erro
+        - codigo_status
+        - timestamp
+        - caminho
+      properties:
+        mensagem_erro:
+          type: string
+          example: "O serviço meteorológico externo está temporariamente indisponível."
+        codigo_status:
+          type: integer
+          example: 503
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-25T15:00:00Z"
+        caminho:
+          type: string
+          example: "/api/v1/cidades/123/previsao"
+
+    CidadeResumida:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+          example: "Porto Alegre"
+        uf:
+          type: string
+          example: "RS"
+        nivel_risco:
+          type: string
+          enum: [NORMAL, ATENCAO, ALERTA, EMERGENCIA]
+          example: "ATENCAO"
+
+    DetalhePrevisaoCidade:
+      type: object
+      properties:
+        cidade_id:
+          type: string
+          format: uuid
+        nome:
+          type: string
+          example: "Porto Alegre"
+        temperatura_hoje:
+          type: number
+          example: 24.5
+        diferenca_temperatura_ontem:
+          type: number
+          example: 2.1
+        nivel_risco_semana:
+          type: string
+          enum: [NORMAL, ATENCAO, ALERTA, EMERGENCIA]
+          example: "ATENCAO"
+        grafico_semanal:
+          type: array
+          items:
+            type: object
+            properties:
+              data:
+                type: string
+                format: date
+              temperatura:
+                type: number
+        refletividade_radar_dbz:
+          type: number
+          example: 38.5
+
+    PaginacaoMeta:
+      type: object
+      properties:
+        pagina_atual:
+          type: integer
+          example: 1
+        total_paginas:
+          type: integer
+          example: 5
+        total_itens:
+          type: integer
+          example: 50

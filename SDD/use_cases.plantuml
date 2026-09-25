@@ -1,0 +1,31 @@
+@startuml
+
+:User: as user
+:Admin: as admin
+
+admin --|> user
+
+package dashboard {
+    user --> (check weather in city/state by search)
+    user --> (weather for today)
+    user --> (check alerts for this week)
+    user --> (weather fluctioations for the past week)
+}
+
+package Map {
+    user --> (alerts in Brazil)
+}
+
+note right of (alerts in Brazil)
+    have points in the map with respective severity
+end note
+
+package AdminDashboard {
+    admin --> (CPU percent usage)
+    admin --> (requisitions per second)
+    admin --> (errors per second)
+    admin --> (memory usage)
+}
+
+
+@enduml
