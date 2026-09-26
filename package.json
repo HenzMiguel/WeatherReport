@@ -1,0 +1,40 @@
+{
+  "name": "weatherreport",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "node --use-system-ca --watch backend/src/server.js",
+    "dev:frontend": "vite frontend --host 127.0.0.1",
+    "start": "node --use-system-ca backend/src/server.js",
+    "build": "vite build frontend",
+    "test": "node --test backend/test/*.test.js",
+    "test:ui": "playwright test",
+    "validate:contract": "node scripts/validate-contract.js",
+    "test:live": "node scripts/verify-live.js",
+    "format": "prettier --write backend/src backend/test frontend/src frontend/test frontend/index.html frontend/vite.config.js scripts features SDD/dashboard-decisions.md SDD/swagger.yaml package.json playwright.config.js README.md"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "http-status-codes": "^2.3.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^12.1.0",
+    "@playwright/test": "^1.56.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.9",
+    "supertest": "^7.1.4",
+    "vite": "^7.1.0"
+  }
+}
