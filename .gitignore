@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+backend/data/*.json
+.env
+*.log
+test-results/
+playwright-report/
+backend/data/*.tmp
