@@ -5,7 +5,7 @@ Technical validation completed on 2026-09-26 before final dashboard review.
 - PASS: non-capital search, accent/case normalization, UF filter, pagination and stable UUIDs (backend/test/location.test.js).
 - PASS: 400 for invalid/duplicate query parameters, 404 outside Brazil, standardized 503 for invalid provider responses.
 - PASS: temporary 5xx retry, exponential waits of 500/1000 ms, timeout exhaustion, no retry for provider 400, correlation propagation.
-- PASS: browser manual search, denied GPS fallback and granted GPS city confirmation (frontend/test/location.spec.js; Edge, headless).
+- PASS: browser manual search, denied GPS fallback, granted GPS lookup and automatic location handling on dashboard load (7 Playwright tests; Edge, headless).
 - PASS: live provider lookup returned Chapecó and Águas de Chapecó, SC. No capital-only restriction.
 - PASS: OpenAPI schema validation and response checks.
 

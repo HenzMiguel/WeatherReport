@@ -24,20 +24,21 @@ test('manual non-capital search and city selection', async ({ page }) => {
   await page.getByRole('button', { name: 'Buscar cidade' }).click();
   await expect(page.getByRole('button', { name: 'Chapecó SC' })).toBeVisible();
 });
-test('denied geolocation keeps manual search available', async ({ page }) => {
+test('denied geolocation keeps manual search available after automatic lookup', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'geolocation', {
       value: { getCurrentPosition: (success, error) => error({ code: 1 }) },
     });
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Usar minha localização' }).click();
   await expect(page.getByRole('alert')).toContainText(
     'Permissão de localização negada',
   );
   await expect(page.getByLabel('Cidade', { exact: true })).toBeEnabled();
 });
-test('GPS result asks for confirmation and displays inferred municipality', async ({
+test('automatic GPS result displays inferred municipality', async ({
   page,
   context,
 }) => {
@@ -53,7 +54,6 @@ test('GPS result asks for confirmation and displays inferred municipality', asyn
     }),
   );
   await page.goto('/');
-  await page.getByRole('button', { name: 'Usar minha localização' }).click();
   await expect(page.getByRole('status')).toContainText('Confira');
   await expect(page.getByRole('button', { name: 'Chapecó SC' })).toBeVisible();
 });

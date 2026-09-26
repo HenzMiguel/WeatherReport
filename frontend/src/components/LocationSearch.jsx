@@ -4,7 +4,7 @@ const UFS =
   'AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(
     ' ',
   );
-export default function LocationSearch({ onSelect, token }) {
+export default function LocationSearch({ onSelect, token, autoLocate = true }) {
   const [name, setName] = useState('');
   const [uf, setUf] = useState('');
   const [results, setResults] = useState(null);
@@ -21,6 +21,9 @@ export default function LocationSearch({ onSelect, token }) {
     },
     [],
   );
+  useEffect(() => {
+    if (autoLocate) locate();
+  }, [autoLocate]);
   async function search(page = 1, existing) {
     const params = existing || { nome: name.trim(), uf };
     if (!params.nome && !params.uf) {
@@ -84,7 +87,8 @@ export default function LocationSearch({ onSelect, token }) {
             dados: [data.cidade],
             paginacao: { pagina_atual: 1, total_paginas: 1, total_itens: 1 },
           });
-          setMessage(data.mensagem);
+          setMessage(data.mensagem + ' Carregando a previsão automaticamente…');
+          onSelect(data.cidade);
         } catch (err) {
           if (err.name !== 'AbortError') {
             setError(err.message);
@@ -114,13 +118,11 @@ export default function LocationSearch({ onSelect, token }) {
           <p className="eyebrow">01 / LOCALIZAÇÃO</p>
           <h2 id="location-title">Qual é a sua cidade?</h2>
         </div>
-        <button className="secondary" onClick={locate} disabled={busy}>
-          ◎ Usar minha localização
-        </button>
       </div>
       <p className="muted">
-        Busque qualquer município brasileiro. Ao usar a localização, suas
-        coordenadas serão enviadas ao serviço de identificação da cidade.
+        Busque qualquer município brasileiro. Ao abrir o dashboard, tentaremos
+        identificar sua localização; suas coordenadas serão enviadas ao serviço
+        de identificação da cidade. Se a permissão falhar, use a busca manual.
       </p>
       <form
         onSubmit={(event) => {

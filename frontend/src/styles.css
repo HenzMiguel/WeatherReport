@@ -281,6 +281,9 @@ p {
   font-weight: 400;
   margin-bottom: 8px;
 }
+.city-heading h2:focus {
+  outline: none;
+}
 .city-heading h2 span {
   font-size: 22px;
   color: #7c7c73;

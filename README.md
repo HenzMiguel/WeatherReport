@@ -67,7 +67,7 @@ Os comandos do backend usam --use-system-ca para respeitar os certificados confi
 - Veja a temperatura atual, a comparação com ontem e os avisos publicados.
 - Confira os gráficos semanal e horário; expanda as tabelas para mostrar os números usados.
 - Mostre as anomalias e a explicação da fórmula.
-- Use o botão de localização e confirme a cidade identificada. Se negar a permissão, a busca manual continua disponível.
+- Deixe o dashboard identificar a cidade automaticamente e confirme a cidade identificada. Se negar a permissão, a busca manual continua disponível.
 - No Swagger, mostre os parâmetros e os erros padronizados. Nunca use dados simulados como resultado de uma consulta real.
 
 ## Verificações
