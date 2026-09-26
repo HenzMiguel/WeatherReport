@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
   title: WeatherReport API (BFF Climático)
-  description: API Backend minimalista do sistema WeatherReport para monitoramento climático, estatísticas de risco e métricas administrativas.
-  version: 1.0
-
+  description:
+    API Backend minimalista do sistema WeatherReport para monitoramento climático, estatísticas de
+    risco e métricas administrativas.
+  version: 1.1.0
 servers:
   - url: http://localhost:3000/api/v1
     description: Servidor de Desenvolvimento Local
-
 paths:
   /auth/login:
     post:
@@ -32,7 +32,7 @@ paths:
                 senha:
                   type: string
                   format: password
-                  example: "SenhaSegura123!"
+                  example: SenhaSegura123!
       responses:
         '200':
           description: Autenticado com sucesso
@@ -43,17 +43,18 @@ paths:
                 properties:
                   token_acesso:
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                   tipo_token:
                     type: string
-                    example: "Bearer"
+                    example: Bearer
                   papel:
                     type: string
-                    enum: [USUARIO, ADMIN]
-                    example: "ADMIN"
+                    enum:
+                      - USUARIO
+                      - ADMIN
+                    example: ADMIN
         '401':
           $ref: '#/components/responses/Erro401'
-
   /cidades:
     get:
       summary: Lista cidades com filtros e paginação
@@ -66,47 +67,74 @@ paths:
           required: false
           schema:
             type: string
-          description: Filtro por nome da cidade (busca parcial)
+            minLength: 2
+            maxLength: 100
+          description: Nome parcial da cidade.
         - name: uf
           in: query
           required: false
           schema:
             type: string
-            minLength: 2
-            maxLength: 2
-          description: Sigla do estado (ex: RS, SC, PR)
+            pattern: ^[A-Za-z]{2}$
+          description: UF brasileira válida.
         - name: page
           in: query
           required: false
           schema:
             type: integer
+            minimum: 1
             default: 1
+            maximum: 1000000
+          description: Página.
         - name: limit
           in: query
           required: false
           schema:
             type: integer
+            minimum: 1
+            maximum: 50
             default: 10
+          description: Itens por página.
         - $ref: '#/components/parameters/HeaderCorrelationId'
       responses:
         '200':
-          description: Lista paginada de cidades
+          description: Lista paginada; sem resultados retorna dados vazio.
+          headers:
+            X-Correlation-Id:
+              schema:
+                type: string
+                format: uuid
+              description: Identificador propagado nos logs.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  dados:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CidadeResumida'
-                  paginacao:
-                    $ref: '#/components/schemas/PaginacaoMeta'
-
+                $ref: '#/components/schemas/ListaCidades'
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '500':
+          $ref: '#/components/responses/Erro500'
+        '503':
+          $ref: '#/components/responses/Erro503'
+      description:
+        Busca municípios brasileiros, sem restrição às capitais. Informe nome (mínimo 2 caracteres) e/ou
+        uf. Filtro parcial sem distinção de acentos/maiúsculas, ordenação por nome e UF, paginação local do
+        resultado completo do provedor. Identificador UUID v5 derivado do código IBGE. Risco não é consultado
+        na busca.
   /cidades/{id}/previsao:
     get:
       summary: Previsão, risco e estatísticas de uma cidade (BFF Transformation)
-      description: Consome dados externos do radar/clima, processa refletividade (dBZ), calcula variações de temperatura e nível de risco.
+      description:
+        'BFF: Open-Meteo fornece temperaturas e Radar Meteorológico fornece avisos oficiais INMET por
+        código IBGE. Compara agora com ontem na mesma hora local (arredondada para baixo). Série diária: hoje
+        e sete dias anteriores, sem horas futuras. Histórico: 24 horários consecutivos. Média móvel: 3 horas
+        completas. Anomalia estatística: referência dos 7 dias anteriores no mesmo horário, |z| >= 2 e
+        |desvio| >= 2 °C; variância zero usa apenas desvio >= 2 °C. Exige 7 amostras; ausência é nula. Não
+        equivale a uma normal climatológica. Risco: maior nível de avisos publicados que intersectam agora até
+        +7 dias; fonte de avisos indisponível retorna 200 com risco nulo e avisos. Falha do clima retorna 503
+        após até 3 tentativas, timeout de 8s e espera exponencial de 500ms/1000ms. Cache de clima de 10
+        minutos; persistência JSON não serve dados expirados como atuais. A cidade deve ter sido retornada por
+        uma busca nesta execução do servidor; após reiniciar, selecione-a novamente. Datas de avisos sem
+        offset são interpretadas no horário de Brasília (UTC-03:00).'
       operationId: obterPrevisaoCidade
       tags:
         - Cidades (BFF)
@@ -120,16 +148,25 @@ paths:
         - $ref: '#/components/parameters/HeaderCorrelationId'
       responses:
         '200':
-          description: Dados processados e unificados pelo BFF
+          description: Dados transformados; campos indisponíveis são nulos e descritos em avisos.
+          headers:
+            X-Correlation-Id:
+              schema:
+                type: string
+                format: uuid
+              description: Identificador propagado nos logs.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DetalhePrevisaoCidade'
+        '400':
+          $ref: '#/components/responses/Erro400'
         '404':
           $ref: '#/components/responses/Erro404'
+        '500':
+          $ref: '#/components/responses/Erro500'
         '503':
           $ref: '#/components/responses/Erro503'
-
   /admin/metricas:
     get:
       summary: Métricas técnicas do servidor (Restrito a ADMIN via RBAC)
@@ -164,14 +201,61 @@ paths:
           $ref: '#/components/responses/Erro401'
         '403':
           $ref: '#/components/responses/Erro403'
-
+  /localizacoes:
+    get:
+      summary: Identifica município brasileiro por coordenadas autorizadas pelo usuário
+      operationId: obterLocalizacao
+      tags:
+        - Cidades
+      description:
+        Nominatim identifica o município; o catálogo Radar Meteorológico confirma nome e UF. Retorna 404
+        para fora do Brasil ou localidade não encontrada. A interface permite confirmar/trocar a cidade
+        inferida.
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            minimum: -90
+            maximum: 90
+          description: Latitude GPS.
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            minimum: -180
+            maximum: 180
+          description: Longitude GPS.
+        - $ref: '#/components/parameters/HeaderCorrelationId'
+      responses:
+        '200':
+          description: Município identificado.
+          headers:
+            X-Correlation-Id:
+              schema:
+                type: string
+                format: uuid
+              description: Identificador propagado nos logs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Localizacao'
+        '400':
+          $ref: '#/components/responses/Erro400'
+        '404':
+          $ref: '#/components/responses/Erro404'
+        '500':
+          $ref: '#/components/responses/Erro500'
+        '503':
+          $ref: '#/components/responses/Erro503'
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   parameters:
     HeaderCorrelationId:
       name: X-Correlation-Id
@@ -181,7 +265,6 @@ components:
         type: string
         format: uuid
       description: Identificador único de correlação para rastreamento nos logs do servidor.
-
   responses:
     Erro400:
       description: Requisição inválida
@@ -189,31 +272,72 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroPadronizado'
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
     Erro401:
       description: Token ausente ou inválido
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroPadronizado'
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
     Erro403:
       description: Acesso negado - Papel insuficiente
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroPadronizado'
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
     Erro404:
       description: Recurso não encontrado
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroPadronizado'
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
     Erro503:
       description: Serviço externo indisponível ou Circuit Breaker aberto
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErroPadronizado'
-
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
+    Erro500:
+      description: Erro interno inesperado
+      headers:
+        X-Correlation-Id:
+          schema:
+            type: string
+            format: uuid
+          description: Identificador da requisição.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErroPadronizado'
   schemas:
     ErroPadronizado:
       type: object
@@ -225,77 +349,277 @@ components:
       properties:
         mensagem_erro:
           type: string
-          example: "O serviço meteorológico externo está temporariamente indisponível."
+          example: O serviço meteorológico externo está temporariamente indisponível.
         codigo_status:
           type: integer
           example: 503
         timestamp:
           type: string
           format: date-time
-          example: "2026-09-25T15:00:00Z"
+          example: 2026-09-25T15:00:00Z
         caminho:
           type: string
-          example: "/api/v1/cidades/123/previsao"
-
+          example: /api/v1/cidades/123/previsao
     CidadeResumida:
       type: object
+      required:
+        - id
+        - codigo_ibge
+        - nome
+        - uf
+        - latitude
+        - longitude
+        - fuso_horario
+        - nivel_risco
       properties:
         id:
           type: string
           format: uuid
+        codigo_ibge:
+          type: string
         nome:
           type: string
-          example: "Porto Alegre"
         uf:
           type: string
-          example: "RS"
+          pattern: ^[A-Z]{2}$
+        latitude:
+          type: number
+        longitude:
+          type: number
+        fuso_horario:
+          type: string
         nivel_risco:
           type: string
-          enum: [NORMAL, ATENCAO, ALERTA, EMERGENCIA]
-          example: "ATENCAO"
-
+          nullable: true
+          enum: &a2
+            - NORMAL
+            - ATENCAO
+            - ALERTA
+            - EMERGENCIA
+            - null
+          description: 'Nulo na busca: consulte a previsão para obter os avisos do município.'
     DetalhePrevisaoCidade:
       type: object
+      required:
+        - cidade_id
+        - nome
+        - uf
+        - fuso_horario
+        - atualizado_em
+        - consultado_em
+        - fonte
+        - temperatura_hoje
+        - diferenca_temperatura_ontem
+        - nivel_risco_semana
+        - risco_semana
+        - grafico_semanal
+        - historico_24h
+        - metodologia
+        - avisos
       properties:
         cidade_id:
           type: string
           format: uuid
         nome:
           type: string
-          example: "Porto Alegre"
+        uf:
+          type: string
+        fuso_horario:
+          type: string
+        atualizado_em: &a1
+          type: string
+          format: date-time
+        consultado_em: *a1
+        fonte:
+          type: string
         temperatura_hoje:
           type: number
-          example: 24.5
+          nullable: true
         diferenca_temperatura_ontem:
           type: number
-          example: 2.1
+          nullable: true
         nivel_risco_semana:
           type: string
-          enum: [NORMAL, ATENCAO, ALERTA, EMERGENCIA]
-          example: "ATENCAO"
+          nullable: true
+          enum: *a2
+        risco_semana:
+          $ref: '#/components/schemas/RiscoSemanal'
         grafico_semanal:
           type: array
           items:
-            type: object
-            properties:
-              data:
-                type: string
-                format: date
-              temperatura:
-                type: number
+            $ref: '#/components/schemas/PontoDiario'
+        historico_24h:
+          type: array
+          items:
+            $ref: '#/components/schemas/PontoHorario'
+        metodologia:
+          $ref: '#/components/schemas/Metodologia'
+        avisos:
+          type: array
+          items:
+            type: string
         refletividade_radar_dbz:
           type: number
-          example: 38.5
-
+          nullable: true
+          description:
+            Campo opcional reservado do contrato original. Não fornecido pelos endpoints públicos utilizados;
+            omitido nesta implementação.
     PaginacaoMeta:
       type: object
+      required:
+        - pagina_atual
+        - total_paginas
+        - total_itens
       properties:
         pagina_atual:
           type: integer
-          example: 1
+          minimum: 1
         total_paginas:
           type: integer
-          example: 5
+          minimum: 0
         total_itens:
           type: integer
-          example: 50
+          minimum: 0
+    ListaCidades:
+      type: object
+      required:
+        - dados
+        - paginacao
+      properties:
+        dados:
+          type: array
+          items:
+            $ref: '#/components/schemas/CidadeResumida'
+        paginacao:
+          $ref: '#/components/schemas/PaginacaoMeta'
+    Localizacao:
+      type: object
+      required:
+        - cidade
+        - fonte
+        - mensagem
+      properties:
+        cidade:
+          $ref: '#/components/schemas/CidadeResumida'
+        fonte:
+          type: string
+        mensagem:
+          type: string
+    PontoDiario:
+      type: object
+      required:
+        - data
+        - temperatura
+        - parcial
+        - amostras
+      properties:
+        data:
+          type: string
+          format: date
+        temperatura:
+          type: number
+          nullable: true
+          description: Média das horas disponíveis até a atualização, em °C.
+        parcial:
+          type: boolean
+        amostras:
+          type: integer
+          minimum: 0
+    PontoHorario:
+      type: object
+      required:
+        - horario
+        - temperatura
+        - media_movel
+        - media_referencia
+        - desvio
+        - z_score
+        - anomalia
+      properties:
+        horario: *a1
+        temperatura:
+          type: number
+          nullable: true
+        media_movel:
+          type: number
+          nullable: true
+          description: Média de três horas consecutivas; nula se faltar qualquer amostra.
+        media_referencia:
+          type: number
+          nullable: true
+          description: Média do mesmo horário nos sete dias anteriores.
+        desvio:
+          type: number
+          nullable: true
+          description: Temperatura menos média de referência, em °C.
+        z_score:
+          type: number
+          nullable: true
+        anomalia:
+          type: boolean
+          nullable: true
+    AlertaDashboard:
+      type: object
+      required:
+        - id
+        - titulo
+        - nivel
+        - inicio
+        - fim
+        - descricao
+        - instrucoes
+      properties:
+        id:
+          type: string
+        titulo:
+          type: string
+        nivel:
+          type: string
+          enum:
+            - ATENCAO
+            - ALERTA
+            - EMERGENCIA
+        inicio: *a1
+        fim: *a1
+        descricao:
+          type: string
+        instrucoes:
+          type: array
+          items:
+            type: string
+    RiscoSemanal:
+      type: object
+      required:
+        - inicio
+        - fim
+        - fonte
+        - cobertura
+        - alertas
+      properties:
+        inicio: *a1
+        fim: *a1
+        fonte:
+          type: string
+        cobertura:
+          type: string
+          description: Somente avisos publicados; não garante cobertura de todos os próximos sete dias.
+        alertas:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertaDashboard'
+    Metodologia:
+      type: object
+      required:
+        - comparacao_ontem
+        - grafico_semanal
+        - media_movel
+        - anomalias
+      properties:
+        comparacao_ontem:
+          type: string
+        grafico_semanal:
+          type: string
+        media_movel:
+          type: string
+        anomalias:
+          type: string
