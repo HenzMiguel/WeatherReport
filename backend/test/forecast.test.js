@@ -40,7 +40,7 @@ function sample() {
 function setup(options = {}) {
   const forecast = createForecastService({
     requestJson: async () => sample(),
-    alerts: async () => ({ level: 'NORMAL', alerts: [] }),
+    alerts: async () => ({ level: null, alerts: [] }),
     history: { read: async () => null, save: async () => {} },
     logger,
     ...options,

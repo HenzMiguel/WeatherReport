@@ -6,17 +6,17 @@ Implemente uma etapa por vez. Cada feature deve ter sua própria pasta em `featu
 
 ## Etapa 1 — Acesso administrativo
 
-- [ ] Disponibilizar entrada para administradores.
-- [ ] Restringir o conteúdo e as ações administrativas a usuários autorizados.
-- [ ] Informar claramente acessos negados ou sessões inválidas.
+- [x] Disponibilizar entrada para administradores.
+- [x] Restringir o conteúdo e as ações administrativas a usuários autorizados.
+- [x] Informar claramente acessos negados ou sessões inválidas.
 
 **Concluída quando:** somente administradores autenticados acessam o painel.
 
 ## Etapa 2 — Métricas do sistema
 
-- [ ] Exibir quantidade de requisições ao longo do tempo.
-- [ ] Exibir quantidade de erros.
-- [ ] Exibir percentual de uso de CPU e memória consumida.
+- [x] Exibir quantidade de requisições ao longo do tempo.
+- [x] Exibir quantidade de erros.
+- [x] Exibir percentual de uso de CPU e memória consumida.
 
 **Concluída quando:** as métricas são apresentadas de forma legível, com período de referência.
 

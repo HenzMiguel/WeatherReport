@@ -1,9 +1,28 @@
+export async function postJson(path, body, { signal } = {}) {
+  return requestJson(path, {
+    signal,
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
 export async function getJson(path, { signal, token } = {}) {
+  return requestJson(path, { signal, token });
+}
+async function requestJson(
+  path,
+  { signal, token, method, body, headers } = {},
+) {
   let response;
   try {
     response = await fetch('/api/v1' + path, {
       signal,
-      headers: { ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+      method,
+      body,
+      headers: {
+        ...headers,
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+      },
     });
   } catch (error) {
     if (error.name === 'AbortError') throw error;
@@ -11,9 +30,9 @@ export async function getJson(path, { signal, token } = {}) {
       'Não foi possível conectar ao servidor. Confira sua conexão e tente novamente.',
     );
   }
-  let body;
+  let responseBody;
   try {
-    body = await response.json();
+    responseBody = await response.json();
   } catch (error) {
     if (error.name === 'AbortError') throw error;
     throw new Error(
@@ -22,7 +41,7 @@ export async function getJson(path, { signal, token } = {}) {
   }
   if (!response.ok)
     throw new Error(
-      body.mensagem_erro || 'Não foi possível consultar os dados.',
+      responseBody.mensagem_erro || 'Não foi possível consultar os dados.',
     );
-  return body;
+  return responseBody;
 }

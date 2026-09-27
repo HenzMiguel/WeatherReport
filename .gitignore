@@ -6,3 +6,5 @@ backend/data/*.json
 test-results/
 playwright-report/
 backend/data/*.tmp
+
+admins.txt

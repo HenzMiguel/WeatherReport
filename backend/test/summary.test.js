@@ -53,9 +53,9 @@ test('risk uses municipality and overlapping dates and highest published severit
   assert.equal(result.level, 'EMERGENCIA');
   assert.equal(result.alerts.length, 2);
   assert.equal(result.alerts[0].inicio, '2026-09-26T13:00:00.000Z');
-  assert.equal(mapAlerts({ alertas: [] }, city, now).level, 'NORMAL');
+  assert.equal(mapAlerts({ alertas: [] }, city, now).level, null);
 });
-test('unknown severity and malformed dates cannot become NORMAL', () => {
+test('unknown severity and malformed dates are unavailable', () => {
   assert.throws(
     () => mapAlerts({ alertas: [{ ...alert, nivel: 9 }] }, city, now),
     { status: 503 },

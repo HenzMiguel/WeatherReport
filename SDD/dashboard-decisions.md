@@ -21,9 +21,9 @@ O escopo de roadmap/dashboard.md foi preservado. Este documento detalha decisõe
 
 ## Risco e avisos
 
-Usar avisos publicados pelo INMET, distribuídos pelo Radar Meteorológico, que incluam o código IBGE selecionado e intersectem agora até sete dias à frente. Níveis 1/2/3 viram ATENCAO/ALERTA/EMERGENCIA. Datas sem offset da fonte são interpretadas em Brasília, UTC-03:00. O maior nível define o resumo.
+Usar avisos publicados pelo INMET, distribuídos pelo Radar Meteorológico, que incluam o código IBGE selecionado e intersectem agora até sete dias à frente. Apenas os níveis 2/3 são expostos como ALERTA/EMERGENCIA; o nível 1 é ignorado. Datas sem offset da fonte são interpretadas em Brasília, UTC-03:00. O maior nível define o resumo.
 
-NORMAL significa apenas nenhum aviso publicado encontrado, não ausência garantida de risco. Falha na fonte resulta em risco null e mensagem de indisponibilidade, preservando o clima disponível. Não inventamos alertas ou refletividade de radar; o campo original refletividade_radar_dbz permanece opcional no contrato e não é preenchido.
+A ausência de alerta permitido retorna risco nulo e não garante ausência de risco. Falha na fonte resulta em risco null e mensagem de indisponibilidade, preservando o clima disponível. Não inventamos alertas ou refletividade de radar; o campo original refletividade_radar_dbz permanece opcional no contrato e não é preenchido.
 
 ## Resiliência e persistência
 

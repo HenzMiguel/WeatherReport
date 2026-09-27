@@ -3,8 +3,6 @@ import LocationSearch from '../components/LocationSearch';
 import TemperatureChart, { number } from '../components/TemperatureChart';
 import { getJson } from '../services/api';
 const riskNames = {
-  NORMAL: 'Sem avisos publicados',
-  ATENCAO: 'Atenção',
   ALERTA: 'Alerta',
   EMERGENCIA: 'Grande perigo',
 };
@@ -74,23 +72,32 @@ function Summary({ data }) {
 }
 function Risk({ data }) {
   const risk = data.nivel_risco_semana;
+  const alertsUnavailable = data.avisos.some((warning) =>
+    warning.includes('Fonte de alertas indisponível'),
+  );
   return (
     <section
-      className={'risk-panel ' + (risk && risk !== 'NORMAL' ? 'has-alert' : '')}
+      className={'risk-panel ' + (risk ? 'has-alert' : '')}
       aria-labelledby="risk-title"
     >
       <div className="section-heading">
         <div>
           <p className="eyebrow">AVISOS PARA A SEMANA</p>
           <h2 id="risk-title">
-            {risk === null ? 'Risco indisponível' : riskNames[risk]}
+            {risk === null
+              ? alertsUnavailable
+                ? 'Risco indisponível'
+                : 'Sem alertas publicados'
+              : riskNames[risk]}
           </h2>
         </div>
         <span className="badge">INMET</span>
       </div>
       <p>
         {risk === null
-          ? 'Não foi possível consultar a fonte de alertas. Tente atualizar em alguns instantes.'
+          ? alertsUnavailable
+            ? 'Não foi possível consultar a fonte de alertas. Tente atualizar em alguns instantes.'
+            : 'Não há alertas de nível alerta ou emergência publicados para este período.'
           : data.risco_semana.cobertura}
       </p>
       <p className="muted">
@@ -325,7 +332,12 @@ export default function Dashboard({ token }) {
           </svg>
           WeatherReport<span className="wordmark-dot">.</span>
         </a>
-        <span className="header-label">OBSERVATÓRIO DO TEMPO / BRASIL</span>
+        <div className="header-actions">
+          <span className="header-label">OBSERVATÓRIO DO TEMPO / BRASIL</span>
+          <a className="header-link" href="/#/admin">
+            Administração
+          </a>
+        </div>
       </header>
       <main>
         <div className="intro">

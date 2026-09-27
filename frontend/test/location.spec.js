@@ -54,6 +54,8 @@ test('automatic GPS result displays inferred municipality', async ({
     }),
   );
   await page.goto('/');
-  await expect(page.getByRole('status')).toContainText('Confira');
+  await expect(
+    page.getByText('Confira a cidade identificada.', { exact: false }),
+  ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Chapecó SC' })).toBeVisible();
 });

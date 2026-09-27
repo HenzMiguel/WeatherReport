@@ -1,6 +1,6 @@
 import { MemoryCache } from '../repositories/cache.js';
 import { unavailable } from './errors.js';
-const levels = ['NORMAL', 'ATENCAO', 'ALERTA', 'EMERGENCIA'];
+const levels = { 2: 'ALERTA', 3: 'EMERGENCIA' };
 function timestamp(value) {
   if (typeof value !== 'string') return NaN;
   // The provider publishes INMET wall times in Brasilia time.
@@ -13,7 +13,7 @@ function timestamp(value) {
 export function mapAlerts(body, city, now = Date.now()) {
   if (!Array.isArray(body.alertas)) throw unavailable();
   const end = now + 7 * 86400000;
-  let max = 0;
+  let max = null;
   const alerts = [];
   for (const item of body.alertas) {
     if (!Array.isArray(item.geocodes)) throw unavailable();
@@ -27,7 +27,8 @@ export function mapAlerts(body, city, now = Date.now()) {
     const level = Number(item.nivel);
     if (![1, 2, 3].includes(level) || typeof item.evento !== 'string')
       throw unavailable();
-    max = Math.max(max, level);
+    if (level === 1) continue;
+    max = max === null ? level : Math.max(max, level);
     alerts.push({
       id: String(item.id),
       titulo: item.evento,
@@ -42,7 +43,7 @@ export function mapAlerts(body, city, now = Date.now()) {
         : [],
     });
   }
-  return { level: levels[max], alerts };
+  return { level: max === null ? null : levels[max], alerts };
 }
 export function createAlertService(
   requestJson,

@@ -1,0 +1,3 @@
+# One administrator per line: email:password
+# Copy this file to admins.txt and replace the sample credentials.
+admin@example.com:replace-with-a-strong-password

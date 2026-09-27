@@ -197,6 +197,34 @@ paths:
                   consumo_memoria_mb:
                     type: number
                     example: 210.5
+                  periodo:
+                    type: object
+                    required: [inicio, fim, intervalo_segundos]
+                    properties:
+                      inicio:
+                        type: string
+                        format: date-time
+                      fim:
+                        type: string
+                        format: date-time
+                      intervalo_segundos:
+                        type: integer
+                        example: 60
+                  requisicoes_por_intervalo:
+                    type: array
+                    description: Rolling one-hour request counts grouped by minute.
+                    items:
+                      type: object
+                      required: [inicio, fim, quantidade]
+                      properties:
+                        inicio:
+                          type: string
+                          format: date-time
+                        fim:
+                          type: string
+                          format: date-time
+                        quantidade:
+                          type: integer
         '401':
           $ref: '#/components/responses/Erro401'
         '403':
@@ -392,8 +420,6 @@ components:
           type: string
           nullable: true
           enum: &a2
-            - NORMAL
-            - ATENCAO
             - ALERTA
             - EMERGENCIA
             - null
@@ -576,7 +602,6 @@ components:
         nivel:
           type: string
           enum:
-            - ATENCAO
             - ALERTA
             - EMERGENCIA
         inicio: *a1

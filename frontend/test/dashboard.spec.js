@@ -20,7 +20,7 @@ function data() {
     fonte: 'Open-Meteo',
     temperatura_hoje: 25,
     diferenca_temperatura_ontem: 2,
-    nivel_risco_semana: 'NORMAL',
+    nivel_risco_semana: 'ALERTA',
     risco_semana: {
       inicio: '2026-09-26T15:00:00Z',
       fim: '2026-10-03T15:00:00Z',
@@ -88,9 +88,7 @@ test('complete dashboard, charts and exact-value tables', async ({ page }) => {
   await expect(
     page.getByRole('table', { name: 'Histórico horário' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'Sem avisos publicados' }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Alerta' })).toBeVisible();
   await page.screenshot({
     path: 'test-results/dashboard-desktop.png',
     fullPage: true,
