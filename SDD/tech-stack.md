@@ -1,5 +1,8 @@
 # Tech Stack
 
+# Style of code
+Tabs must be 4 spaces. There needs to be 1 new line between groups of codes that do different things. Put comments in functions with lots of steps.
+
 # Frontend
 - React/js with vite
 
