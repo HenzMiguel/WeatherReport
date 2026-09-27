@@ -22,9 +22,9 @@ Implemente uma etapa por vez. Cada feature deve ter sua própria pasta em `featu
 
 ## Etapa 3 — Filtros e estados da página
 
-- [ ] Permitir filtrar alertas por severidade.
-- [ ] Informar quando não houver alertas para a área consultada.
-- [ ] Tratar carregamento e indisponibilidade dos dados.
+- [x] Permitir filtrar alertas por severidade.
+- [x] Informar quando não houver alertas para a área consultada.
+- [x] Tratar carregamento e indisponibilidade dos dados.
 
 **Concluída quando:** filtros e mensagens de estado alteram a visualização de maneira correta.
 
