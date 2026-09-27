@@ -117,7 +117,7 @@ test('provider failure allows retry and loading is visible', async ({
     'Serviço climático indisponível',
   );
   await page.getByRole('button', { name: 'Tentar novamente' }).click();
-  await expect(page.getByRole('status')).toContainText('Consultando');
+  await expect(page.getByRole('progressbar')).toContainText('Consultando');
   await expect(
     page.getByRole('heading', { name: 'Uma semana de temperaturas' }),
   ).toBeVisible();

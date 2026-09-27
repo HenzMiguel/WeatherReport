@@ -650,3 +650,97 @@ footer a {
     font-size: 22px;
   }
 }
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #62625c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.site-nav a {
+  text-decoration: none;
+}
+.site-nav a[aria-current='page'] {
+  color: #22221f;
+  text-decoration: underline;
+}
+.map-intro {
+  padding-bottom: 28px;
+}
+.map-panel {
+  background: #fff;
+  border: 1px solid #d5d5ce;
+  border-radius: 6px;
+  padding: 28px 30px 30px;
+  margin-bottom: 42px;
+}
+.map-canvas {
+  overscroll-behavior: contain;
+  min-height: 480px;
+  margin: 24px 0 12px;
+  overflow: hidden;
+  border: 1px solid #d5d5ce;
+  border-radius: 4px;
+  background: #f1f1ec;
+}
+.brazil-map {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  width: 100%;
+  height: 480px;
+  transition: all 0.35s ease;
+}
+.map-status {
+  color: #52524c;
+  font-size: 14px;
+  min-height: 24px;
+}
+.map-reset {
+  margin-top: 20px;
+}
+@media (max-width: 700px) {
+  .site-nav {
+    gap: 12px;
+    font-size: 10px;
+  }
+  .map-panel {
+    padding: 22px 20px;
+  }
+  .map-canvas,
+  .brazil-map {
+    min-height: 350px;
+    height: 350px;
+  }
+}
+.state-shapes path {
+  cursor: pointer;
+  fill: #d9d9d1;
+  stroke: #fff;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+  transition: fill 0.15s ease;
+}
+.state-shapes path:hover,
+.state-shapes path:focus {
+  fill: #9b9b91;
+  outline: none;
+}
+.brazil-map.is-dragging .state-shapes path {
+  cursor: grabbing;
+}
+.state-shapes path.is-selected {
+  fill: #262623;
+}
+.state-shapes path:focus-visible {
+  stroke: #22221f;
+  stroke-width: 4;
+}
+.map-attribution {
+  margin: 18px 0 0;
+  color: #737369;
+  font-size: 11px;
+}

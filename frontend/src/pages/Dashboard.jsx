@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import LocationSearch from '../components/LocationSearch';
+import SiteNavigation from '../components/SiteNavigation';
 import TemperatureChart, { number } from '../components/TemperatureChart';
 import { getJson } from '../services/api';
 const riskNames = {
@@ -325,7 +326,7 @@ export default function Dashboard({ token }) {
           </svg>
           WeatherReport<span className="wordmark-dot">.</span>
         </a>
-        <span className="header-label">OBSERVATÓRIO DO TEMPO / BRASIL</span>
+        <SiteNavigation active="dashboard" />
       </header>
       <main>
         <div className="intro">
@@ -377,7 +378,11 @@ export default function Dashboard({ token }) {
               </button>
             </div>
             {busy && (
-              <div className="loading-state" role="status">
+              <div
+                className="loading-state"
+                role="progressbar"
+                aria-label="Carregando dados climáticos"
+              >
                 <span className="loading-dot" />
                 Consultando temperaturas e avisos de {city.nome}…
               </div>

@@ -6,9 +6,9 @@ Implemente uma etapa por vez. Cada feature deve ter sua própria pasta em `featu
 
 ## Etapa 1 — Recorte geográfico
 
-- [ ] Apresentar o mapa do Brasil.
-- [ ] Centralizar a visualização na região inferida pela localização do usuário quando disponível.
-- [ ] Permitir selecionar manualmente uma região brasileira.
+- [x] Apresentar o mapa do Brasil.
+- [x] Centralizar a visualização na região inferida pela localização do usuário quando disponível.
+- [x] Permitir selecionar manualmente uma região brasileira.
 
 **Concluída quando:** o usuário visualiza o território brasileiro e consegue mudar a região de referência.
 
