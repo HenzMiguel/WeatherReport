@@ -225,6 +225,49 @@ paths:
                           format: date-time
                         quantidade:
                           type: integer
+                  erros_por_intervalo:
+                    type: array
+                    description: Rolling one-hour error counts grouped by minute.
+                    items:
+                      type: object
+                      required: [inicio, fim, quantidade]
+                      properties:
+                        inicio: { type: string, format: date-time }
+                        fim: { type: string, format: date-time }
+                        quantidade: { type: integer }
+                  uso_cpu_por_intervalo:
+                    type: array
+                    description: Process CPU usage samples grouped by minute.
+                    items:
+                      type: object
+                      required: [inicio, fim]
+                      properties:
+                        inicio: { type: string, format: date-time }
+                        fim: { type: string, format: date-time }
+                        porcentagem: { type: number, nullable: true }
+                  consumo_memoria_por_intervalo:
+                    type: array
+                    description: Resident-memory samples grouped by minute.
+                    items:
+                      type: object
+                      required: [inicio, fim]
+                      properties:
+                        inicio: { type: string, format: date-time }
+                        fim: { type: string, format: date-time }
+                        megabytes: { type: number, nullable: true }
+                  erros:
+                    type: array
+                    description: Up to 100 newest failed requests in the reference period.
+                    items:
+                      type: object
+                      required:
+                        [timestamp, metodo, rota, status, correlation_id]
+                      properties:
+                        timestamp: { type: string, format: date-time }
+                        metodo: { type: string }
+                        rota: { type: string }
+                        status: { type: integer }
+                        correlation_id: { type: string, format: uuid }
         '401':
           $ref: '#/components/responses/Erro401'
         '403':

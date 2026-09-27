@@ -36,4 +36,9 @@ test('admin metrics are protected and report a readable one-hour request series'
   assert.equal(response.body.total_erros, 1);
   assert.equal(response.body.consumo_memoria_mb, 200);
   assert.equal(response.body.uso_cpu_porcentagem, 50);
+  assert.equal(response.body.erros_por_intervalo.length, 60);
+  assert.equal(response.body.uso_cpu_por_intervalo.length, 60);
+  assert.equal(response.body.consumo_memoria_por_intervalo.length, 60);
+  assert.equal(response.body.erros[0].status, 401);
+  assert.equal(response.body.erros[0].rota, '/api/v1/admin/metricas');
 });

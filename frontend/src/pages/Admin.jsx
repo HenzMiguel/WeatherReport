@@ -19,38 +19,41 @@ function formatPeriod(period) {
     timeStyle: 'short',
   }).format(new Date(period));
 }
-function RequestsChart({ data }) {
-  const max = Math.max(1, ...data.map((bucket) => bucket.quantidade));
+function MetricsChart({
+  id,
+  title,
+  eyebrow,
+  data,
+  valueKey,
+  unit = '',
+  tone = '',
+}) {
+  const values = data.map((bucket) => bucket[valueKey] ?? 0);
+  const max = Math.max(1, ...values);
   return (
-    <section className="admin-chart" aria-labelledby="requests-title">
+    <section className="admin-chart" aria-labelledby={`${id}-title`}>
       <div className="section-heading">
         <div>
-          <p className="eyebrow">REQUISIÇÕES</p>
-          <h2 id="requests-title">Volume por minuto</h2>
+          <p className="eyebrow">{eyebrow}</p>
+          <h2 id={`${id}-title`}>{title}</h2>
         </div>
         <span className="muted">Últimos 60 minutos</span>
       </div>
       <div
-        className="request-bars"
+        className={`request-bars ${tone}`}
         role="img"
-        aria-label="Gráfico de requisições por minuto"
+        aria-label={`${title} nos últimos 60 minutos`}
       >
-        <>
-          {data.map((bucket) => (
+        {data.map((bucket) => {
+          const value = bucket[valueKey] ?? 0;
+          return (
             <span
               key={bucket.inicio}
-              title={
-                new Date(bucket.inicio).toLocaleTimeString('pt-BR') +
-                ': ' +
-                bucket.quantidade +
-                ' requisições'
-              }
-              style={{
-                height: Math.max(3, (bucket.quantidade / max) * 100) + '%',
-              }}
+              title={`${new Date(bucket.inicio).toLocaleTimeString('pt-BR')}: ${value}${unit}`}
+              style={{ height: Math.max(3, (value / max) * 100) + '%' }}
             />
-          ))}
-        </>
+          );
+        })}
       </div>
     </section>
   );
@@ -107,7 +110,71 @@ function Metrics({ metrics, onRefresh, busy, error }) {
               <small>memória residente</small>
             </article>
           </div>
-          <RequestsChart data={metrics.requisicoes_por_intervalo} />
+          <div className="admin-charts">
+            <MetricsChart
+              id="requests"
+              title="Volume por minuto"
+              eyebrow="REQUISIÇÕES"
+              data={metrics.requisicoes_por_intervalo}
+              valueKey="quantidade"
+              unit=" requisições"
+            />
+            <MetricsChart
+              id="errors"
+              title="Erros por minuto"
+              eyebrow="ERROS"
+              data={metrics.erros_por_intervalo}
+              valueKey="quantidade"
+              unit=" erros"
+              tone="error-bars"
+            />
+            <MetricsChart
+              id="cpu"
+              title="Uso por minuto"
+              eyebrow="CPU"
+              data={metrics.uso_cpu_por_intervalo}
+              valueKey="porcentagem"
+              unit="%"
+              tone="cpu-bars"
+            />
+            <MetricsChart
+              id="memory"
+              title="Consumo por minuto"
+              eyebrow="MEMÓRIA"
+              data={metrics.consumo_memoria_por_intervalo}
+              valueKey="megabytes"
+              unit=" MB"
+              tone="memory-bars"
+            />
+          </div>
+          <section
+            className="admin-errors"
+            aria-labelledby="generated-errors-title"
+          >
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">ERROS GERADOS</p>
+                <h2 id="generated-errors-title">Ocorrências no período</h2>
+              </div>
+            </div>
+            {metrics.erros.length ? (
+              <ul>
+                {metrics.erros.map((item) => (
+                  <li key={`${item.timestamp}-${item.correlation_id}`}>
+                    <time dateTime={item.timestamp}>
+                      {formatPeriod(item.timestamp)}
+                    </time>
+                    <code>
+                      {item.metodo} {item.rota}
+                    </code>
+                    <strong>{item.status}</strong>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">Nenhum erro foi gerado neste período.</p>
+            )}
+          </section>
         </>
       )}
     </section>

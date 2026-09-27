@@ -761,6 +761,14 @@ footer a {
   padding: 26px 28px;
   margin-top: 16px;
 }
+.admin-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.admin-charts .admin-chart {
+  margin-top: 16px;
+}
 .request-bars {
   height: 150px;
   display: flex;
@@ -773,6 +781,39 @@ footer a {
   background: #3e3e38;
   flex: 1;
   min-width: 2px;
+}
+.request-bars.error-bars span {
+  background: #9e3030;
+}
+.request-bars.cpu-bars span {
+  background: #356a94;
+}
+.request-bars.memory-bars span {
+  background: #647743;
+}
+.admin-errors {
+  background: #fff;
+  border: 1px solid #d5d5ce;
+  border-radius: 5px;
+  margin-top: 16px;
+  padding: 26px 28px;
+}
+.admin-errors ul {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+}
+.admin-errors li {
+  border-top: 1px solid #e2e2dc;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 145px 1fr auto;
+  padding: 12px 0;
+}
+.admin-errors time,
+.admin-errors code {
+  color: #65655f;
+  font-size: 12px;
 }
 .admin-signout {
   margin-bottom: 40px;
@@ -794,5 +835,18 @@ footer a {
   }
   .admin-chart {
     padding: 20px;
+  }
+  .admin-charts {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .admin-errors {
+    padding: 20px;
+  }
+  .admin-errors li {
+    grid-template-columns: 1fr auto;
+  }
+  .admin-errors code {
+    grid-column: 1 / -1;
   }
 }

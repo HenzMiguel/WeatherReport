@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+test('dashboard navigation opens the administrative page', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Administração' }).click();
+  await expect(page).toHaveURL(/#\/admin$/);
+  await expect(
+    page.getByRole('heading', { name: 'Acesso administrativo' }),
+  ).toBeVisible();
+});
+
 test('administrative page authenticates before exposing protected content', async ({
   page,
 }) => {
@@ -57,6 +66,30 @@ test('administrative page presents system metrics with a reference period', asyn
           fim: '2026-09-27T11:01:00.000Z',
           quantidade: index % 4,
         })),
+        erros_por_intervalo: Array.from({ length: 60 }, (_, index) => ({
+          inicio: '2026-09-27T11:00:00.000Z',
+          fim: '2026-09-27T11:01:00.000Z',
+          quantidade: index % 2,
+        })),
+        uso_cpu_por_intervalo: Array.from({ length: 60 }, () => ({
+          inicio: '2026-09-27T11:00:00.000Z',
+          fim: '2026-09-27T11:01:00.000Z',
+          porcentagem: 12.4,
+        })),
+        consumo_memoria_por_intervalo: Array.from({ length: 60 }, () => ({
+          inicio: '2026-09-27T11:00:00.000Z',
+          fim: '2026-09-27T11:01:00.000Z',
+          megabytes: 210.5,
+        })),
+        erros: [
+          {
+            timestamp: '2026-09-27T11:30:00.000Z',
+            metodo: 'GET',
+            rota: '/api/v1/inexistente',
+            status: 404,
+            correlation_id: '4d757c67-1eeb-4d58-9899-2214b6632eab',
+          },
+        ],
       },
     }),
   );
@@ -70,4 +103,14 @@ test('administrative page presents system metrics with a reference period', asyn
   await expect(
     page.getByRole('heading', { name: 'Volume por minuto' }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Erros por minuto' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Uso por minuto' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Consumo por minuto' }),
+  ).toBeVisible();
+  await expect(page.getByText('GET /api/v1/inexistente')).toBeVisible();
 });

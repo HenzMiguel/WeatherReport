@@ -26,7 +26,14 @@ export function correlation(logger = console) {
 }
 export function collectMetrics(metrics) {
   return (req, res, next) => {
-    res.on('finish', () => metrics.record(res.statusCode));
+    res.on('finish', () =>
+      metrics.record({
+        status: res.statusCode,
+        method: req.method,
+        path: req.path,
+        correlationId: req.correlationId,
+      }),
+    );
     next();
   };
 }
