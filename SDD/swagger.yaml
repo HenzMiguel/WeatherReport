@@ -250,6 +250,24 @@ paths:
           $ref: '#/components/responses/Erro500'
         '503':
           $ref: '#/components/responses/Erro503'
+  /mapa/alertas:
+    get:
+      summary: Active climate alerts for the Brazil map
+      operationId: listarAlertasAtivosMapa
+      tags:
+        - Mapa
+      description: Returns one point per municipality covered by an INMET alert active now through the next seven days.
+      parameters:
+        - $ref: '#/components/parameters/HeaderCorrelationId'
+      responses:
+        '200':
+          description: Active alert points with severity and details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaAlertasMapa'
+        '503':
+          $ref: '#/components/responses/Erro503'
 components:
   securitySchemes:
     BearerAuth:
@@ -393,7 +411,6 @@ components:
           nullable: true
           enum: &a2
             - NORMAL
-            - ATENCAO
             - ALERTA
             - EMERGENCIA
             - null
@@ -576,7 +593,6 @@ components:
         nivel:
           type: string
           enum:
-            - ATENCAO
             - ALERTA
             - EMERGENCIA
         inicio: *a1
@@ -587,6 +603,38 @@ components:
           type: array
           items:
             type: string
+    AlertaMapa:
+      allOf:
+        - $ref: '#/components/schemas/AlertaDashboard'
+        - type: object
+          required:
+            - cidade
+            - uf
+            - latitude
+            - longitude
+          properties:
+            cidade:
+              type: string
+            uf:
+              type: string
+              pattern: ^[A-Z]{2}$
+            latitude:
+              type: number
+            longitude:
+              type: number
+    ListaAlertasMapa:
+      type: object
+      required:
+        - atualizado_em
+        - alertas
+      properties:
+        atualizado_em:
+          type: string
+          format: date-time
+        alertas:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertaMapa'
     RiscoSemanal:
       type: object
       required:

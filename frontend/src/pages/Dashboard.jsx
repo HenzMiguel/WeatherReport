@@ -5,7 +5,6 @@ import TemperatureChart, { number } from '../components/TemperatureChart';
 import { getJson } from '../services/api';
 const riskNames = {
   NORMAL: 'Sem avisos publicados',
-  ATENCAO: 'Atenção',
   ALERTA: 'Alerta',
   EMERGENCIA: 'Grande perigo',
 };

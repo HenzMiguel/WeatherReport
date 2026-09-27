@@ -14,9 +14,9 @@ Implemente uma etapa por vez. Cada feature deve ter sua própria pasta em `featu
 
 ## Etapa 2 — Alertas climáticos
 
-- [ ] Exibir alertas ativos como pontos no mapa.
-- [ ] Diferenciar visualmente os pontos conforme a severidade.
-- [ ] Mostrar detalhes do alerta ao selecionar um ponto.
+- [x] Exibir alertas ativos como pontos no mapa.
+- [x] Diferenciar visualmente os pontos conforme a severidade.
+- [x] Mostrar detalhes do alerta ao selecionar um ponto.
 
 **Concluída quando:** cada alerta ativo é identificável no mapa, com severidade e informações relevantes.
 

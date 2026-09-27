@@ -1,6 +1,6 @@
 import { MemoryCache } from '../repositories/cache.js';
 import { unavailable } from './errors.js';
-const levels = ['NORMAL', 'ATENCAO', 'ALERTA', 'EMERGENCIA'];
+const levels = ['NORMAL', 'NORMAL', 'ALERTA', 'EMERGENCIA'];
 function timestamp(value) {
   if (typeof value !== 'string') return NaN;
   // The provider publishes INMET wall times in Brasilia time.
@@ -27,6 +27,7 @@ export function mapAlerts(body, city, now = Date.now()) {
     const level = Number(item.nivel);
     if (![1, 2, 3].includes(level) || typeof item.evento !== 'string')
       throw unavailable();
+    if (level === 1) continue;
     max = Math.max(max, level);
     alerts.push({
       id: String(item.id),
@@ -51,13 +52,19 @@ export function createAlertService(
   const cache = new MemoryCache(27);
   return async (city, correlationId) => {
     let body = cache.get(city.uf);
-    if (!body) {
-      const url = new URL('/api/v1/alertas', baseUrl);
-      url.searchParams.set('uf', city.uf);
-      body = await requestJson(url, { correlationId });
-      if (!Array.isArray(body.alertas)) throw unavailable();
-      cache.set(city.uf, body, 600000);
+    if (body) {
+      try {
+        return mapAlerts(body, city);
+      } catch {
+        cache.delete(city.uf);
+      }
     }
-    return mapAlerts(body, city);
+    const url = new URL('/api/v1/alertas', baseUrl);
+    url.searchParams.set('uf', city.uf);
+    body = await requestJson(url, { correlationId });
+    if (!Array.isArray(body.alertas)) throw unavailable();
+    const result = mapAlerts(body, city);
+    cache.set(city.uf, body, 600000);
+    return result;
   };
 }

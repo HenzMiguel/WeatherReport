@@ -22,7 +22,12 @@ function integer(value, fallback, max, name) {
     invalid(name + ' inválido.');
   return Number(raw);
 }
-export function createDashboardControllers({ cities, locate, forecast }) {
+export function createDashboardControllers({
+  cities,
+  locate,
+  forecast,
+  mapAlerts,
+}) {
   return {
     list: async (req, res) => {
       const nome = text(req.query.nome, 'nome');
@@ -74,6 +79,9 @@ export function createDashboardControllers({ cities, locate, forecast }) {
           'Cidade não encontrada. Busque e selecione a cidade novamente.',
         );
       res.json(await forecast(city, req.correlationId));
+    },
+    mapAlerts: async (req, res) => {
+      res.json(await mapAlerts(req.correlationId));
     },
   };
 }

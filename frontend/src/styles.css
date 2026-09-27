@@ -677,6 +677,88 @@ footer a {
   padding: 28px 30px 30px;
   margin-bottom: 42px;
 }
+.map-alert-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  font-size: 12px;
+  color: #55554e;
+}
+.map-alert-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.map-alert-symbol {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #22221f;
+  border-radius: 50%;
+  display: inline-block;
+}
+.map-alert-symbol.ALERTA {
+  background: #e79036;
+  border-radius: 2px;
+}
+.map-alert-symbol.EMERGENCIA {
+  background: #c94b43;
+  transform: rotate(45deg);
+}
+.map-alert-point {
+  cursor: pointer;
+}
+.map-alert-point .map-alert-ring {
+  fill: #fff;
+  stroke: #22221f;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.map-alert-point .map-alert-core {
+  stroke: #22221f;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.map-alert-point.ALERTA .map-alert-ring {
+  rx: 2px;
+}
+.map-alert-point.ALERTA .map-alert-core {
+  fill: #e79036;
+}
+.map-alert-point.EMERGENCIA .map-alert-ring {
+  stroke-width: 3;
+}
+.map-alert-point.EMERGENCIA .map-alert-core {
+  fill: #c94b43;
+}
+.map-alert-point.is-selected .map-alert-ring {
+  stroke-width: 4;
+}
+.map-alert-point:focus {
+  outline: none;
+}
+.map-alert-point:focus-visible .map-alert-ring {
+  stroke: #000;
+  stroke-width: 5;
+}
+.map-alert-details {
+  margin: 18px 0;
+  padding: 20px 22px;
+  border: 1px solid #d5d5ce;
+  border-left: 5px solid #e79036;
+  background: #fafaf7;
+  font-size: 14px;
+}
+.map-alert-details.EMERGENCIA {
+  border-left-color: #b43730;
+}
+.map-alert-details h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
 .map-canvas {
   overscroll-behavior: contain;
   min-height: 480px;

@@ -18,4 +18,7 @@ export class MemoryCache {
     this.entries.set(key, { value, expires: Date.now() + ttl });
     return value;
   }
+  delete(key) {
+    this.entries.delete(key);
+  }
 }

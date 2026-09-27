@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import brazil from '@svg-country-maps/brazil';
 import { getJson } from '../services/api';
 import SiteNavigation from '../components/SiteNavigation';
+import MapAlertLayer, { AlertLegend } from '../components/MapAlertLayer';
 
 const stateUfs = {
   ac: 'AC',
@@ -43,12 +44,22 @@ function parseViewBox(value) {
   const [x, y, width, height] = value.split(' ').map(Number);
   return { x, y, width, height };
 }
-function BrazilMap({ selected, onSelect }) {
+function BrazilMap({
+  selected,
+  onSelect,
+  alerts,
+  selectedAlert,
+  onAlertSelect,
+}) {
   const svg = useRef(null);
   const [viewBox, setViewBox] = useState(brazil.viewBox);
   const [dragging, setDragging] = useState(false);
   const drag = useRef(null);
   const didDrag = useRef(false);
+  const markerScale = Math.min(
+    1,
+    parseViewBox(viewBox).width / parseViewBox(brazil.viewBox).width,
+  );
   useEffect(() => {
     if (!selected) {
       setViewBox(brazil.viewBox);
@@ -185,15 +196,33 @@ function BrazilMap({ selected, onSelect }) {
           </path>
         ))}
       </g>
+      <MapAlertLayer
+        alerts={alerts}
+        selected={selectedAlert}
+        onSelect={onAlertSelect}
+        scale={markerScale}
+        shouldIgnoreClick={() => didDrag.current}
+      />
     </svg>
   );
 }
 export default function Map({ token }) {
   const [selected, setSelected] = useState(null);
+  const [alerts, setAlerts] = useState([]);
+  const [selectedAlert, setSelectedAlert] = useState(null);
   const [status, setStatus] = useState(
     'Clique em um estado para ampliar o mapa.',
   );
   const [error, setError] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    getJson('/mapa/alertas', { signal: controller.signal, token })
+      .then((response) => setAlerts(response.alertas))
+      .catch((err) => {
+        if (err.name !== 'AbortError') setAlerts([]);
+      });
+    return () => controller.abort();
+  }, [token]);
   useEffect(() => {
     if (!navigator.geolocation) return undefined;
     const controller = new AbortController();
@@ -235,6 +264,10 @@ export default function Map({ token }) {
     setError('');
     setStatus(`Mapa ampliado em ${state.name}, ${stateUfs[state.id]}.`);
   }
+  function selectAlert(alert) {
+    setSelectedAlert(alert);
+    setStatus(alert.titulo + ': ' + alert.cidade + ', ' + alert.uf + '.');
+  }
   return (
     <div className="app-shell map-page">
       <header className="site-header">
@@ -264,18 +297,75 @@ export default function Map({ token }) {
         <section className="map-panel" aria-labelledby="map-title">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">01 / RECORTE GEOGRÁFICO</p>
-              <h2 id="map-title">Território brasileiro</h2>
+              <p className="eyebrow">02 / ALERTAS CLIMÁTICOS</p>
+              <h2 id="map-title">Alertas no território brasileiro</h2>
             </div>
             {selected && <span className="badge">{stateUfs[selected.id]}</span>}
           </div>
           <p className="muted">
-            Fronteiras estaduais e Distrito Federal. Clique, use Enter ou Espaço
-            sobre um estado; role sobre o mapa para aproximar ou afastar.
+            Cada ponto indica um município coberto por um aviso INMET ativo.
+            Clique, use Enter ou Espaço sobre um estado; role sobre o mapa para
+            aproximar ou afastar.
           </p>
+          <AlertLegend />
           <div className="map-canvas">
-            <BrazilMap selected={selected} onSelect={select} />
+            <BrazilMap
+              selected={selected}
+              onSelect={select}
+              alerts={alerts}
+              selectedAlert={selectedAlert}
+              onAlertSelect={selectAlert}
+            />
           </div>
+          {selectedAlert && (
+            <article
+              className={'map-alert-details ' + selectedAlert.nivel}
+              aria-labelledby="alert-title"
+            >
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">{selectedAlert.nivel}</p>
+                  <h3 id="alert-title">{selectedAlert.titulo}</h3>
+                </div>
+                <button
+                  className="secondary"
+                  type="button"
+                  onClick={() => setSelectedAlert(null)}
+                >
+                  Fechar detalhes
+                </button>
+              </div>
+              <p>
+                <strong>
+                  {selectedAlert.cidade}, {selectedAlert.uf}
+                </strong>
+              </p>
+              <p>
+                {selectedAlert.descricao ||
+                  'Sem descrição adicional para este aviso.'}
+              </p>
+              <p className="muted">
+                Válido de{' '}
+                {new Intl.DateTimeFormat('pt-BR', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                }).format(new Date(selectedAlert.inicio))}{' '}
+                até{' '}
+                {new Intl.DateTimeFormat('pt-BR', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                }).format(new Date(selectedAlert.fim))}
+                .
+              </p>
+              {selectedAlert.instrucoes.length > 0 && (
+                <ul>
+                  {selectedAlert.instrucoes.map((instruction) => (
+                    <li key={instruction}>{instruction}</li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          )}
           <p className="map-status" role="status" aria-live="polite">
             {status}
           </p>

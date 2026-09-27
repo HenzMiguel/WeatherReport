@@ -10,7 +10,7 @@ test('shows a state-accurate Brazil map and zooms on a clicked state', async ({
   });
   await page.goto('/#/mapa');
   await expect(
-    page.getByRole('heading', { name: 'Território brasileiro' }),
+    page.getByRole('heading', { name: 'Alertas no território brasileiro' }),
   ).toBeVisible();
   await expect(
     page.getByRole('img', {
