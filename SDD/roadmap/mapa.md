@@ -30,8 +30,8 @@ Implemente uma etapa por vez. Cada feature deve ter sua própria pasta em `featu
 
 ## Etapa 4 — Revisão da página
 
-- [ ] Validar a localização dos alertas, a severidade e os filtros.
-- [ ] Revisar a legibilidade e a navegação no mapa.
-- [ ] Registrar a validação de cada feature em seu respectivo `validation.md`.
+- [x] Validar a localização dos alertas, a severidade e os filtros.
+- [x] Revisar a legibilidade e a navegação no mapa.
+- [x] Registrar a validação de cada feature em seu respectivo `validation.md`.
 
 **Concluída quando:** todas as features possuem requisitos e validações documentados e aprovados.

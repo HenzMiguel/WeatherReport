@@ -11,3 +11,9 @@ Technical validation completed on 2026-09-26.
 - PASS: production build and nine Playwright browser scenarios pass in Edge headless.
 
 Evidence: `frontend/test/map.spec.js`. No alert markers, severity UI, or alert details are included; they remain roadmap stage 2.
+
+## Stage 4 review — 2026-09-27
+
+- PASS: the state map remains keyboard navigable, with visible focus and clear labels for every state.
+- PASS: map navigation keeps click, keyboard, wheel zoom, and drag interactions available without compromising the full-Brazil fallback.
+- PASS: the production build and the complete 17-scenario Playwright suite pass.

@@ -10,3 +10,9 @@ Technical validation completed on 2026-09-26.
 - PASS: OpenAPI validation, 20 backend tests, 10 Playwright scenarios, and the production build pass.
 
 Evidence: `backend/test/map-alerts.test.js` and `frontend/test/map-alerts.spec.js`.
+
+## Stage 4 review — 2026-09-27
+
+- PASS: backend validation confirms that alert points use covered-municipality coordinates and exclude notices outside the active seven-day window.
+- PASS: alert severity remains recognizable through named, keyboard-reachable controls and distinct marker geometry in addition to color.
+- PASS: selecting a marker exposes the required alert details; the production build and the complete 17-scenario Playwright suite pass.
