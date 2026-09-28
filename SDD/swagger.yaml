@@ -55,6 +55,40 @@ paths:
                     example: ADMIN
         "401":
           $ref: "#/components/responses/Erro401"
+        "400":
+          $ref: "#/components/responses/Erro400"
+        "503":
+          $ref: "#/components/responses/Erro503"
+        "500":
+          $ref: "#/components/responses/Erro500"
+  /admin/sessao:
+    get:
+      summary: Consulta a sessão administrativa atual
+      description: Valida o JWT do administrador e retorna a identidade associada à sessão.
+      operationId: obterSessaoAdministrativa
+      security:
+        - BearerAuth: []
+      tags:
+        - Administração (RBAC)
+      parameters:
+        - $ref: "#/components/parameters/HeaderCorrelationId"
+      responses:
+        "200":
+          description: Sessão administrativa válida.
+          headers:
+            X-Correlation-Id:
+              schema:
+                type: string
+                format: uuid
+              description: Identificador propagado nos logs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessaoAdministrativa"
+        "401":
+          $ref: "#/components/responses/Erro401"
+        "500":
+          $ref: "#/components/responses/Erro500"
   /cidades:
     get:
       summary: Lista cidades com filtros e paginação
@@ -449,6 +483,21 @@ components:
         caminho:
           type: string
           example: /api/v1/cidades/123/previsao
+    SessaoAdministrativa:
+      type: object
+      required:
+        - email
+        - papel
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@weatherreport.com
+        papel:
+          type: string
+          enum:
+            - ADMIN
+          example: ADMIN
     CidadeResumida:
       type: object
       required:
