@@ -1,6 +1,6 @@
 services:
   api:
-    build: .
+    image: ghcr.io/henzmiguel/weatherreport:latest
     command: npm run start
     environment:
       PORT: 3000
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: .
+    image: ghcr.io/henzmiguel/weatherreport:latest
     command: npx vite frontend --host 0.0.0.0
     environment:
       API_PROXY_TARGET: http://api:3000
