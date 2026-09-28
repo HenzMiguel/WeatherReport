@@ -10,32 +10,27 @@ Boa parte das funcionalidades descritas abaixo estarão no final do projeto. Por
 
 ## Visão do usúario:
 
-    Dashboard           Mapa           Rankings
-        │                │                │
+### Dashboard           
+- Temperatura atual
+- avisos metereológicos
+- Temperatura de hoje comparado a 7 dias
 
-cidades favoritas alertas Brasil anomalias
-temperatura severidade tendências
-risco localização
-gráficos
-│
-└───────────────┐
-│
-Cidade
-│
-histórico 24h
-média móvel
-anomalia
-alertas
+### Mapa          
+- Alertas com cidade, estado
+- Cobre o brasil inteiro
+- Pesquisa manual por cidade
+
+### Rankings
+
 
 ## Adminstrador do sistema:
 
-            Dashboard
-                |
-
-Quantidades de requisições ao longo do tempo
-Quantidade de erros
-Porcentagem da CPU utilizada
-Memória consumida
+### Dashboard
+            
+- Quantidades de requisições ao longo do tempo
+- Quantidade de erros
+- Porcentagem da CPU utilizada
+- Memória consumida
 
 # Integrantes
 
@@ -61,14 +56,9 @@ Os comandos do backend usam --use-system-ca para respeitar os certificados confi
     $env:NODE_OPTIONS='--use-system-ca'
     npm install
 
-## Como demonstrar
+## Como rodar
 
-- Busque Chapecó e selecione SC; confirme Chapecó na lista (a busca pode trazer Águas de Chapecó também).
-- Veja a temperatura atual, a comparação com ontem e os avisos publicados.
-- Confira os gráficos semanal e horário; expanda as tabelas para mostrar os números usados.
-- Mostre as anomalias e a explicação da fórmula.
-- Deixe o dashboard identificar a cidade automaticamente e confirme a cidade identificada. Se negar a permissão, a busca manual continua disponível.
-- No Swagger, mostre os parâmetros e os erros padronizados. Nunca use dados simulados como resultado de uma consulta real.
+AUTH_SECRET="$(openssl rand -hex 32)" npm run dev
 
 ## Verificações
 
@@ -94,11 +84,3 @@ Os testes de interface usam o Microsoft Edge instalado em modo headless. Em outr
 O histórico processado é salvo automaticamente em backend/data/*.json, fora do versionamento. Após reiniciar a API, busque a cidade novamente para repopular o índice local de UUIDs. Dados de cache expirados não são apresentados como atuais. Falha apenas na fonte de alertas preserva temperaturas, mas mostra risco indisponível.
 
 Para habilitar o acesso administrativo, copie `admin.example.txt` para `admins.txt`, cadastre um administrador por linha no formato `email:senha` e configure `AUTH_SECRET` com um segredo longo e aleatório. `admins.txt` é ignorado pelo Git e nunca deve ser versionado. URLs dos provedores podem ser configuradas por variáveis de ambiente RADAR_BASE_URL, OPEN_METEO_BASE_URL e NOMINATIM_BASE_URL. DATA_DIR altera a pasta de persistência. PORT altera a API, mas exige ajustar também o proxy do Vite. Os padrões atendem à execução local sem configuração.
-
-## GitHub Desktop — entrega ainda local
-
-A branch de trabalho é codex/dashboard. Confira esse nome em Current branch. As mudanças aparecem em Changes e ainda precisam ser revisadas e commitadas; arquivos sem commit podem acompanhar uma troca de branch, portanto permaneça nela até combinarmos os commits.
-
-Nenhum push, pull request ou merge foi feito. Depois da sua revisão, a sequência será: commit local, Publish branch, criação do pull request para main, seleção do revisor e merge após revisão. Esses passos serão feitos somente quando você autorizar.
-
-Com os servidores em execução, npm run test:live confere as fontes reais, o contrato e o navegador usando Chapecó como referência. Esse teste depende da disponibilidade dos serviços externos. npm run format padroniza a formatação do código.
