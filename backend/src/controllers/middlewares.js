@@ -24,6 +24,19 @@ export function correlation(logger = console) {
         next();
     };
 }
+export function collectMetrics(metrics) {
+    return (req, res, next) => {
+        res.on('finish', () =>
+            metrics.record({
+                status: res.statusCode,
+                method: req.method,
+                path: req.path,
+                correlationId: req.correlationId,
+            }),
+        );
+        next();
+    };
+}
 export function errorHandler(logger = console) {
     return (error, req, res, next) => {
         if (res.headersSent) return next(error);
@@ -48,5 +61,23 @@ export function errorHandler(logger = console) {
             timestamp: new Date().toISOString(),
             caminho: req.path,
         });
+    };
+}
+export function requireAdmin(auth) {
+    return (req, res, next) => {
+        const authorization = req.get('Authorization');
+        if (!authorization?.startsWith('Bearer '))
+            return next(
+                new AppError(
+                    StatusCodes.UNAUTHORIZED,
+                    'É necessário entrar como administrador para acessar este conteúdo.',
+                ),
+            );
+        try {
+            req.admin = auth.verify(authorization.slice('Bearer '.length));
+            next();
+        } catch (error) {
+            next(error);
+        }
     };
 }

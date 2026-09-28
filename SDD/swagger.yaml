@@ -197,6 +197,124 @@ paths:
                                     consumo_memoria_mb:
                                         type: number
                                         example: 210.5
+                                    periodo:
+                                        type: object
+                                        required:
+                                            [inicio, fim, intervalo_segundos]
+                                        properties:
+                                            inicio:
+                                                type: string
+                                                format: date-time
+                                            fim:
+                                                type: string
+                                                format: date-time
+                                            intervalo_segundos:
+                                                type: integer
+                                                example: 60
+                                    requisicoes_por_intervalo:
+                                        type: array
+                                        description: Rolling one-hour request counts grouped by minute.
+                                        items:
+                                            type: object
+                                            required: [inicio, fim, quantidade]
+                                            properties:
+                                                inicio:
+                                                    type: string
+                                                    format: date-time
+                                                fim:
+                                                    type: string
+                                                    format: date-time
+                                                quantidade:
+                                                    type: integer
+                                    erros_por_intervalo:
+                                        type: array
+                                        description: Rolling one-hour error counts grouped by minute.
+                                        items:
+                                            type: object
+                                            required: [inicio, fim, quantidade]
+                                            properties:
+                                                inicio:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                fim:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                quantidade: { type: integer }
+                                    uso_cpu_por_intervalo:
+                                        type: array
+                                        description: Process CPU usage samples grouped by minute.
+                                        items:
+                                            type: object
+                                            required: [inicio, fim]
+                                            properties:
+                                                inicio:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                fim:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                porcentagem:
+                                                    {
+                                                        type: number,
+                                                        nullable: true,
+                                                    }
+                                    consumo_memoria_por_intervalo:
+                                        type: array
+                                        description: Resident-memory samples grouped by minute.
+                                        items:
+                                            type: object
+                                            required: [inicio, fim]
+                                            properties:
+                                                inicio:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                fim:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                megabytes:
+                                                    {
+                                                        type: number,
+                                                        nullable: true,
+                                                    }
+                                    erros:
+                                        type: array
+                                        description: Up to 100 newest failed requests in the reference period.
+                                        items:
+                                            type: object
+                                            required:
+                                                [
+                                                    timestamp,
+                                                    metodo,
+                                                    rota,
+                                                    status,
+                                                    correlation_id,
+                                                ]
+                                            properties:
+                                                timestamp:
+                                                    {
+                                                        type: string,
+                                                        format: date-time,
+                                                    }
+                                                metodo: { type: string }
+                                                rota: { type: string }
+                                                status: { type: integer }
+                                                correlation_id:
+                                                    {
+                                                        type: string,
+                                                        format: uuid,
+                                                    }
                 '401':
                     $ref: '#/components/responses/Erro401'
                 '403':
@@ -252,16 +370,16 @@ paths:
                     $ref: '#/components/responses/Erro503'
     /mapa/alertas:
         get:
-            summary: Active climate alerts for the Brazil map
+            summary: Alertas climáticos ativos no mapa do Brasil
             operationId: listarAlertasAtivosMapa
             tags:
                 - Mapa
-            description: Returns one point per municipality covered by an INMET alert active now through the next seven days.
+            description: Retorna um ponto por município coberto por alerta INMET ativo agora até os próximos sete dias.
             parameters:
                 - $ref: '#/components/parameters/HeaderCorrelationId'
             responses:
                 '200':
-                    description: Active alert points with severity and details.
+                    description: Pontos de alertas ativos, com severidade e detalhes.
                     content:
                         application/json:
                             schema:

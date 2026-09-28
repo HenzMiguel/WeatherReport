@@ -93,7 +93,7 @@ Os testes de interface usam o Microsoft Edge instalado em modo headless. Em outr
 
 O histórico processado é salvo automaticamente em backend/data/*.json, fora do versionamento. Após reiniciar a API, busque a cidade novamente para repopular o índice local de UUIDs. Dados de cache expirados não são apresentados como atuais. Falha apenas na fonte de alertas preserva temperaturas, mas mostra risco indisponível.
 
-URLs dos provedores podem ser configuradas por variáveis de ambiente RADAR_BASE_URL, OPEN_METEO_BASE_URL e NOMINATIM_BASE_URL. DATA_DIR altera a pasta de persistência. PORT altera a API, mas exige ajustar também o proxy do Vite. Os padrões atendem à execução local sem configuração.
+Para habilitar o acesso administrativo, copie `admin.example.txt` para `admins.txt`, cadastre um administrador por linha no formato `email:senha` e configure `AUTH_SECRET` com um segredo longo e aleatório. `admins.txt` é ignorado pelo Git e nunca deve ser versionado. URLs dos provedores podem ser configuradas por variáveis de ambiente RADAR_BASE_URL, OPEN_METEO_BASE_URL e NOMINATIM_BASE_URL. DATA_DIR altera a pasta de persistência. PORT altera a API, mas exige ajustar também o proxy do Vite. Os padrões atendem à execução local sem configuração.
 
 ## GitHub Desktop — entrega ainda local
 

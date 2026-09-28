@@ -35,7 +35,7 @@ Clima/avisos: cache de 10 minutos. Municípios/geolocalização: 24 horas. Respo
 
 As consultas do dashboard continuam públicas como no contrato original. O colega de autenticação precisa implementar login/JWT e combinar no Swagger quais rotas serão protegidas. O frontend já aceita a prop token e envia Authorization: Bearer. Não há login fictício nem bypass de um middleware existente.
 
-Login e métricas aparecem no Swagger por serem parte do contrato da equipe; ainda não são implementados neste backend. Mapa, rankings e criação administrativa de alertas também ficam com os responsáveis. Alertas oficiais do dashboard não dependem da futura criação manual de alertas.
+Login e métricas aparecem no Swagger por serem parte do contrato da equipe; ainda não são implementados neste backend. Mapa e rankings também ficam com os responsáveis. O painel administrativo é exclusivamente de observabilidade: métricas do sistema e consulta aos erros gerados. Alertas oficiais do dashboard vêm das fontes externas e não são criados pelo painel administrativo.
 
 ## Documentação das fontes
 

@@ -350,7 +350,15 @@ export default function Dashboard({ token }) {
                     </svg>
                     WeatherReport<span className="wordmark-dot">.</span>
                 </a>
-                <SiteNavigation active="dashboard" />
+                <div className="header-actions">
+                    <span className="header-label">
+                        OBSERVATÓRIO DO TEMPO / BRASIL
+                    </span>
+                    <SiteNavigation active="dashboard" />
+                    <a className="header-link" href="/#/admin">
+                        Administração
+                    </a>
+                </div>
             </header>
             <main>
                 <div className="intro">
