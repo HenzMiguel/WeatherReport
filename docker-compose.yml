@@ -5,11 +5,10 @@ services:
     environment:
       PORT: 3000
       DATA_DIR: /app/backend/data
-      # Defina AUTH_SECRET para habilitar a autenticação administrativa.
-      AUTH_SECRET: ${AUTH_SECRET:-}
-      RADAR_BASE_URL: ${RADAR_BASE_URL:-}
-      OPEN_METEO_BASE_URL: ${OPEN_METEO_BASE_URL:-}
-      NOMINATIM_BASE_URL: ${NOMINATIM_BASE_URL:-}
+      AUTH_SECRET: weatherreport-docker-secret
+      RADAR_BASE_URL: https://radarmeteorologico.com.br
+      OPEN_METEO_BASE_URL: https://api.open-meteo.com
+      NOMINATIM_BASE_URL: https://nominatim.openstreetmap.org
     ports:
       - "3000:3000"
     volumes:
