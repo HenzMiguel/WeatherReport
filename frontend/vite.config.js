@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 export default defineConfig({
     server: {
+        allowedHosts: [
+            "weather.henzmiguel.dev",
+        ],
         port: 5173,
         strictPort: true,
         host: '0.0.0.0',
