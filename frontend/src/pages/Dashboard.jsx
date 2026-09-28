@@ -414,7 +414,11 @@ export default function Dashboard({ token }) {
                             </button>
                         </div>
                         {busy && (
-                            <div className="loading-state" role="status">
+                            <div
+                                className="loading-state"
+                                role="progressbar"
+                                aria-label="Carregando dados climáticos"
+                            >
                                 <span className="loading-dot" />
                                 Consultando temperaturas e avisos de {city.nome}
                                 …
