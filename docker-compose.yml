@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    command: npm run start
+    environment:
+      PORT: 3000
+      DATA_DIR: /app/backend/data
+      # Defina AUTH_SECRET para habilitar a autenticação administrativa.
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      RADAR_BASE_URL: ${RADAR_BASE_URL:-}
+      OPEN_METEO_BASE_URL: ${OPEN_METEO_BASE_URL:-}
+      NOMINATIM_BASE_URL: ${NOMINATIM_BASE_URL:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - weather-data:/app/backend/data
+    restart: unless-stopped
+
+  frontend:
+    build: .
+    command: npx vite frontend --host 0.0.0.0
+    environment:
+      API_PROXY_TARGET: http://api:3000
+    depends_on:
+      - api
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+
+volumes:
+  weather-data:

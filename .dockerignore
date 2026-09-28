@@ -1,0 +1,9 @@
+node_modules
+frontend/dist
+backend/data
+.git
+.env
+admins.txt
+test-results
+playwright-report
+npm-debug.log

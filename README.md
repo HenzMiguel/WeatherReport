@@ -60,6 +60,17 @@ Os comandos do backend usam --use-system-ca para respeitar os certificados confi
 
 AUTH_SECRET="$(openssl rand -hex 32)" npm run dev
 
+## Docker
+
+Com Docker Compose instalado, execute:
+
+    docker compose up --build
+
+O dashboard fica disponível em http://localhost:5173 e a documentação da API em
+http://localhost:3000/api/docs. O volume `weather-data` preserva o histórico
+processado entre reinicializações. Para ativar o acesso administrativo, defina
+`AUTH_SECRET` no ambiente antes de iniciar os contêineres.
+
 ## Verificações
 
     npm run validate:contract
